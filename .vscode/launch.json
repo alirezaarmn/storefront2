@@ -1,0 +1,19 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Django: Run manage.py",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/manage.py",
+            "args": ["runserver", "8000"],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "DYLD_LIBRARY_PATH": "/usr/local/mysql-9.5.0-macos15-arm64/lib:${env:DYLD_LIBRARY_PATH}"
+            },
+            "django": true
+        }
+    ]
+}
+
