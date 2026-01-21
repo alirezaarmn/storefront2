@@ -1,0 +1,89 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: testpass
+          MYSQL_DATABASE: storefront_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.9'
+    
+    - name: Install Pipenv
+      run: |
+        pip install pipenv
+    
+    - name: Install dependencies
+      run: |
+        pipenv install --dev
+    
+    - name: Run migrations
+      env:
+        DB_HOST: 127.0.0.1
+        DB_PORT: 3306
+        DB_USER: root
+        DB_PASSWORD: testpass
+        DB_NAME: storefront_test
+      run: |
+        pipenv run python manage.py migrate --noinput
+    
+    - name: Run tests
+      env:
+        DB_HOST: 127.0.0.1
+        DB_PORT: 3306
+        DB_USER: root
+        DB_PASSWORD: testpass
+        DB_NAME: storefront_test
+      run: |
+        pipenv run python manage.py test
+    
+    - name: Check code formatting
+      run: |
+        pipenv run autopep8 --diff --recursive --exclude=migrations .
+
+  lint:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.9'
+    
+    - name: Install Pipenv
+      run: |
+        pip install pipenv
+    
+    - name: Install dependencies
+      run: |
+        pipenv install --dev
+    
+    - name: Run Django system check
+      run: |
+        pipenv run python manage.py check
+
