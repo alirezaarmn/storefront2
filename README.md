@@ -16,3 +16,8 @@ run the celery process to run flower
 ```
 celery -A storefront flower
 ```
+--------------test
+```
+pipenv install --dev pytest
+pipenv install --dev pytest-django
+```
